@@ -2,6 +2,7 @@ const inquirer = require("inquirer");
 const mysql = require("mysql2");
 require("dotenv").config();
 const { connection } = require("./config/db");
+const cTable = require("console.table");
 // const express = require("express");
 
 // const PORT = process.env.PORT || 3001;
@@ -89,11 +90,10 @@ const addRole = function () {
 const viewDepartments = function () {
   connection.connect(function (err) {
     if (err) throw err;
-    console.log("Connected!");
     var sql = `SELECT * FROM department`;
     connection.query(sql, (err, result) => {
       if (err) throw err;
-      console.log(result);
+      console.table(result);
       mainInq();
     });
   });
