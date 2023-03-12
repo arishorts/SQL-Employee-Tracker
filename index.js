@@ -63,7 +63,30 @@ const mainInq = function () {
 };
 
 const allEmployees = function () {
-  console.log("adding an employee...");
+  connection.connect(function (err) {
+    if (err) throw err;
+    var sql = `SELECT 
+    e.id,
+    e.first_name,
+    e.last_name,
+    r.title,
+    d.name,
+    r.salary,
+    m.first_name AS manager  
+    FROM employee e
+    JOIN role r
+    ON e.role_id = r.id
+    JOIN department d
+    ON d.id = r.department_id
+    LEFT JOIN employee m
+    ON e.manager_id = m.id`;
+    connection.query(sql, (err, result) => {
+      if (err) throw err;
+      console.log("\n");
+      console.table(result);
+      mainInq();
+    });
+  });
   mainInq();
 };
 
@@ -78,7 +101,23 @@ const updateEmployee = function () {
 };
 
 const viewRoles = function () {
-  console.log("viewing all roles...");
+  connection.connect(function (err) {
+    if (err) throw err;
+    var sql = `SELECT 
+    r.id,
+    r.title,
+    r.salary,
+    d.name
+    FROM role r
+    JOIN department d
+    ON r.department_id = d.id`;
+    connection.query(sql, (err, result) => {
+      if (err) throw err;
+      console.log("\n");
+      console.table(result);
+      mainInq();
+    });
+  });
   mainInq();
 };
 
@@ -93,6 +132,7 @@ const viewDepartments = function () {
     var sql = `SELECT * FROM department`;
     connection.query(sql, (err, result) => {
       if (err) throw err;
+      console.log("\n");
       console.table(result);
       mainInq();
     });
