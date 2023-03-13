@@ -140,8 +140,52 @@ const viewDepartments = async function () {
   console.table(result);
 };
 
-const addEmployee = function () {
-  console.log("adding an employee...");
+const addEmployee = async function () {
+  const roles = await getRoles();
+  const employees = await getEmployees();
+  const q = [
+    {
+      type: "input",
+      name: "first",
+      message: "What is their first name?",
+    },
+    {
+      type: "input",
+      name: "last",
+      message: "What is their last name?",
+    },
+    {
+      type: "list",
+      name: "manager",
+      message: "Who is their manager?",
+      choices: employees.map(
+        (employee) => `${employee.first_name} ${employee.last_name}`
+      ),
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "What is their role?",
+      choices: roles.map((role) => role.title),
+    },
+  ];
+  const answers = await inquirer.prompt(q);
+  // const indexEmployee = employees.findIndex(
+  //   (obj) => obj.first_name == answers.first
+  // );
+  managerName = answers.manager.split(" ");
+  const indexManager = employees.findIndex(
+    (obj) => obj.first_name == managerName[0] && obj.last_name == managerName[1]
+  );
+  const indexRoles = roles.findIndex((obj) => obj.title == answers.role);
+  var sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+  VALUES ('${answers.first}','${answers.last}',${roles[indexRoles].id},${employees[indexManager].id});`;
+  return new Promise((res, rej) => {
+    connection.query(sql, (err, result) => {
+      if (err) rej(err);
+      res(result);
+    });
+  });
 };
 
 const addRole = async function () {
@@ -176,8 +220,23 @@ const addRole = async function () {
   });
 };
 
-const addDepartment = function () {
-  console.log("adding a department...");
+const addDepartment = async function () {
+  const q = [
+    {
+      type: "input",
+      name: "department",
+      message: "What is the department title?",
+    },
+  ];
+  const answers = await inquirer.prompt(q);
+  var sql = `INSERT INTO department (name)
+  VALUES ('${answers.department}');`;
+  return new Promise((res, rej) => {
+    connection.query(sql, (err, result) => {
+      if (err) rej(err);
+      res(result);
+    });
+  });
 };
 
 const updateEmployee = function () {
