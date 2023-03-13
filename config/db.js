@@ -9,6 +9,15 @@ const connection = mysql.createConnection({
   multipleStatements: true,
 });
 
+connection.connect(function (err) {
+  if (err) {
+    console.error("error connecting: " + err.stack);
+    return;
+  }
+
+  console.log("connected as id " + connection.threadId);
+});
+
 // Read the schema file
 const schema = fs.readFileSync("./config/generate_sql_db.sql", "utf8");
 
