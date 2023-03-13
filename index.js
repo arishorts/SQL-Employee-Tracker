@@ -1,8 +1,11 @@
+//START WITH 'mysql -u root -p'
+
 const inquirer = require("inquirer");
-const mysql = require("mysql2");
-require("dotenv").config();
+const Employee = require("./lib/employee");
+const Role = require("./lib/role");
+const Department = require("./lib/department");
 const { connection } = require("./config/db");
-const cTable = require("console.table");
+require("console.table");
 // const express = require("express");
 
 // const PORT = process.env.PORT || 3001;
@@ -14,6 +17,10 @@ const cTable = require("console.table");
 
 //https://www.npmjs.com/package/dotenv
 //https://www.youtube.com/watch?v=344Zv2m9TYI&ab_channel=TheFullStackJunkie
+
+const roleObj = new Role();
+const departmentObj = new Department();
+const employeeObj = new Employee();
 
 const mainInq = async function () {
   const q = [
@@ -37,25 +44,25 @@ const mainInq = async function () {
   const answers = await inquirer.prompt(q);
   switch (answers.viewAll) {
     case "View All Employees":
-      viewAllEmployees();
+      await viewAllEmployees();
       break;
     case "Add Employee":
-      addEmployee();
+      await addEmployee();
       break;
     case "Update Employee Role":
-      updateEmployee();
+      await updateEmployee();
       break;
     case "View All Roles":
-      viewRoles();
+      await viewRoles();
       break;
     case "Add Role":
-      addRole();
+      await addRole();
       break;
     case "View All Departments":
-      viewDepartments();
+      await viewDepartments();
       break;
     case "Add Department":
-      addDepartment();
+      await addDepartment();
       break;
     case "Exit":
       // close the MySQL connection
@@ -68,81 +75,32 @@ const mainInq = async function () {
       });
       return;
   }
+  console.log("\n");
   await mainInq();
 };
 
-const getDepartments = async function () {
-  var sql = `SELECT * FROM department`;
-  return new Promise((res, rej) => {
-    connection.query(sql, (err, result) => {
-      if (err) rej(err);
-      res(result);
-    });
-  });
-};
-
-const getRoles = async function () {
-  var sql = `SELECT 
-    r.id,
-    r.title,
-    r.salary,
-    d.name
-    FROM role r
-    JOIN department d
-    ON r.department_id = d.id`;
-  return new Promise((res, rej) => {
-    connection.query(sql, (err, result) => {
-      if (err) rej(err);
-      res(result);
-    });
-  });
-};
-
-const getEmployees = async function () {
-  var sql = `SELECT 
-  e.id,
-  e.first_name,
-  e.last_name,
-  r.title,
-  d.name,
-  r.salary,
-  m.first_name AS manager  
-  FROM employee e
-  JOIN role r
-  ON e.role_id = r.id
-  JOIN department d
-  ON d.id = r.department_id
-  LEFT JOIN employee m
-  ON e.manager_id = m.id`;
-  return new Promise((res, rej) => {
-    connection.query(sql, (err, result) => {
-      if (err) rej(err);
-      res(result);
-    });
-  });
-};
-
 const viewAllEmployees = async function () {
-  const result = await getEmployees();
-  console.log("\n");
+  const result = await employeeObj.getEmployees();
   console.table(result);
 };
 
 const viewRoles = async function () {
-  const result = await getRoles();
-  console.log("\n");
+  const result = await roleObj.getRoles();
   console.table(result);
 };
 
 const viewDepartments = async function () {
-  const result = await getDepartments();
-  console.log("\n");
+  const result = await departmentObj.getDepartments();
   console.table(result);
 };
 
 const addEmployee = async function () {
-  const roles = await getRoles();
-  const employees = await getEmployees();
+  const roles = await roleObj.getRoles();
+  const employees = await employeeObj.getEmployees();
+  employeesArray = employees.map(
+    (employee) => `${employee.first_name} ${employee.last_name}`
+  );
+
   const q = [
     {
       type: "input",
@@ -158,9 +116,7 @@ const addEmployee = async function () {
       type: "list",
       name: "manager",
       message: "Who is their manager?",
-      choices: employees.map(
-        (employee) => `${employee.first_name} ${employee.last_name}`
-      ),
+      choices: [...employeesArray, "null"],
     },
     {
       type: "list",
@@ -169,27 +125,19 @@ const addEmployee = async function () {
       choices: roles.map((role) => role.title),
     },
   ];
-  const answers = await inquirer.prompt(q);
-  // const indexEmployee = employees.findIndex(
-  //   (obj) => obj.first_name == answers.first
-  // );
-  managerName = answers.manager.split(" ");
-  const indexManager = employees.findIndex(
-    (obj) => obj.first_name == managerName[0] && obj.last_name == managerName[1]
-  );
-  const indexRoles = roles.findIndex((obj) => obj.title == answers.role);
-  var sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-  VALUES ('${answers.first}','${answers.last}',${roles[indexRoles].id},${employees[indexManager].id});`;
-  return new Promise((res, rej) => {
-    connection.query(sql, (err, result) => {
-      if (err) rej(err);
-      res(result);
-    });
+
+  const { first, last, manager, role } = await inquirer.prompt(q);
+  const employee = new Employee(first, last, manager, role);
+  return new Promise((resolve, reject) => {
+    employee
+      .addEmployee()
+      .then(() => resolve())
+      .catch((error) => reject(error));
   });
 };
 
 const addRole = async function () {
-  const departments = await getDepartments();
+  const departments = await departmentObj.getDepartments();
   const q = [
     {
       type: "input",
@@ -208,15 +156,13 @@ const addRole = async function () {
       choices: departments.map((department) => department.name),
     },
   ];
-  const answers = await inquirer.prompt(q);
-  const index = departments.findIndex((obj) => obj.name == answers.department);
-  var sql = `INSERT INTO role (title, salary, department_id)
-  VALUES ('${answers.title}',${answers.salary}, ${departments[index].id});`;
-  return new Promise((res, rej) => {
-    connection.query(sql, (err, result) => {
-      if (err) rej(err);
-      res(result);
-    });
+  const { title, salary, department } = await inquirer.prompt(q);
+  const role = new Role(title, salary, department);
+  return new Promise((resolve, reject) => {
+    role
+      .addRole()
+      .then(() => resolve())
+      .catch((error) => reject(error));
   });
 };
 
@@ -224,18 +170,17 @@ const addDepartment = async function () {
   const q = [
     {
       type: "input",
-      name: "department",
+      name: "department_name",
       message: "What is the department title?",
     },
   ];
-  const answers = await inquirer.prompt(q);
-  var sql = `INSERT INTO department (name)
-  VALUES ('${answers.department}');`;
-  return new Promise((res, rej) => {
-    connection.query(sql, (err, result) => {
-      if (err) rej(err);
-      res(result);
-    });
+  const { department_name } = await inquirer.prompt(q);
+  const department = new Department(department_name);
+  return new Promise((resolve, reject) => {
+    department
+      .addDepartment()
+      .then(() => resolve())
+      .catch((error) => reject(error));
   });
 };
 
@@ -268,4 +213,5 @@ console.log(`
 ██    ██ ██      ██  ██ ██ ██      ██   ██ ██   ██    ██    ██    ██ ██   ██ 
  ██████  ███████ ██   ████ ███████ ██   ██ ██   ██    ██     ██████  ██   ██ 
                                                                              `);
+
 mainInq();
