@@ -44,7 +44,8 @@ const mainInq = async function () {
   const answers = await inquirer.prompt(q);
   switch (answers.viewAll) {
     case "View All Employees":
-      await viewAllEmployees();
+      result = await employeeObj.getEmployees();
+      console.table(result);
       break;
     case "Add Employee":
       await addEmployee();
@@ -53,13 +54,15 @@ const mainInq = async function () {
       await updateEmployee();
       break;
     case "View All Roles":
-      await viewRoles();
+      result = await roleObj.getRoles();
+      console.table(result);
       break;
     case "Add Role":
       await addRole();
       break;
     case "View All Departments":
-      await viewDepartments();
+      result = await departmentObj.getDepartments();
+      console.table(result);
       break;
     case "Add Department":
       await addDepartment();
@@ -75,23 +78,7 @@ const mainInq = async function () {
       });
       return;
   }
-  console.log("\n");
   await mainInq();
-};
-
-const viewAllEmployees = async function () {
-  const result = await employeeObj.getEmployees();
-  console.table(result);
-};
-
-const viewRoles = async function () {
-  const result = await roleObj.getRoles();
-  console.table(result);
-};
-
-const viewDepartments = async function () {
-  const result = await departmentObj.getDepartments();
-  console.table(result);
 };
 
 const addEmployee = async function () {
@@ -129,10 +116,7 @@ const addEmployee = async function () {
   const { first, last, manager, role } = await inquirer.prompt(q);
   const employee = new Employee(first, last, manager, role);
   return new Promise((resolve, reject) => {
-    employee
-      .addEmployee()
-      .then(() => resolve())
-      .catch((error) => reject(error));
+    employee.addEmployee().then(() => resolve());
   });
 };
 
@@ -159,10 +143,7 @@ const addRole = async function () {
   const { title, salary, department } = await inquirer.prompt(q);
   const role = new Role(title, salary, department);
   return new Promise((resolve, reject) => {
-    role
-      .addRole()
-      .then(() => resolve())
-      .catch((error) => reject(error));
+    role.addRole().then(() => resolve());
   });
 };
 
@@ -177,10 +158,7 @@ const addDepartment = async function () {
   const { department_name } = await inquirer.prompt(q);
   const department = new Department(department_name);
   return new Promise((resolve, reject) => {
-    department
-      .addDepartment()
-      .then(() => resolve())
-      .catch((error) => reject(error));
+    department.addDepartment().then(() => resolve());
   });
 };
 
