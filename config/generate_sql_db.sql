@@ -47,7 +47,7 @@ VALUES
 ('Kyle','Broflovski', 5, null),
 ('Kenny','McCormick', 6, 5),
 ('Butters','Stotch',7, null),
-('Big Gay','Al', 8, 7);
+('Big','Al', 8, 7);
 
 -- USE sql_store;
 -- SELECT 

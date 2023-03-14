@@ -30,12 +30,12 @@ const mainInq = async function () {
       message: "What would you like to do?",
       choices: [
         "View All Employees",
-        "Add Employee",
-        "Update Employee Role",
         "View All Roles",
-        "Add Role",
         "View All Departments",
+        "Add Employee",
+        "Add Role",
         "Add Department",
+        "Update Employee Role",
         "Exit",
       ],
     },
@@ -51,7 +51,7 @@ const mainInq = async function () {
       await addEmployee();
       break;
     case "Update Employee Role":
-      await updateEmployee();
+      await updateEmployeeRole();
       break;
     case "View All Roles":
       result = await roleObj.getRoles();
@@ -162,8 +162,32 @@ const addDepartment = async function () {
   });
 };
 
-const updateEmployee = function () {
-  console.log("updating an employee...");
+const updateEmployeeRole = async function () {
+  console.log(employeeObj);
+  const roles = await roleObj.getRoles();
+  const employees = await employeeObj.getEmployees();
+  employeesArray = employees.map(
+    (employee) => `${employee.first_name} ${employee.last_name}`
+  );
+  const q = [
+    {
+      type: "list",
+      name: "employee",
+      message: "Which employee is being updated?",
+      choices: employeesArray,
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "What is their new role?",
+      choices: roles.map((role) => role.title),
+    },
+  ];
+
+  const { employee, role } = await inquirer.prompt(q);
+  return new Promise((resolve, reject) => {
+    employeeObj.updateEmployeeRole(employee, role).then(() => resolve());
+  });
 };
 
 // // Default response for any other request (Not Found)
