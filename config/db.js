@@ -13,11 +13,11 @@ const connection = mysql.createConnection({
 
 connection.connect();
 
-// Read the schema file
-const schema = fs.readFileSync("./config/generate_sql_db.sql", "utf8");
+// // Read the schema file
+// const schema = fs.readFileSync("./config/generate_sql_db.sql", "utf8");
 
-// Execute the schema as a query
-connection.query(schema);
+// // Execute the schema as a query
+// connection.query(schema);
 
 module.exports = {
   connection: connection,
