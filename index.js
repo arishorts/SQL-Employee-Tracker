@@ -158,7 +158,6 @@ const addDepartment = async function () {
 };
 
 const updateEmployeeRole = async function () {
-  console.log(employeeObj);
   const roles = await roleObj.getRoles();
   const employees = await employeeObj.getEmployees();
   employeesArray = employees.map(

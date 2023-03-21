@@ -51,6 +51,7 @@ source db/seeds.sql
 ## Usage:
 
 &nbsp; The website can be found at: https://github.com/arishorts/SQL-Employee-Tracker
+&nbsp; A video demonstration can be seen at: https://youtu.be/Pgshoafgazk
 
 ![alt text](./assets/images/demo.JPG)
 
