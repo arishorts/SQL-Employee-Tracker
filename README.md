@@ -29,16 +29,23 @@ SO THAT I can organize and plan my business
 ## Installation:
 
 1. Start by opening a terminal or command prompt and navigating to the directory where the code is located.<br>
-2. Enter the command mysql -u root -p to log in to your MySQL server. Password to login in is
-
-```
-password123
-```
-
-3. Once you are logged in, run the command npm install to install the required packages.<br>
+2. Run 'npm i' install to install the required packages.<br>
 
 ```
 npm i
+```
+
+3. Enter the command below to be prompted for a password to log in to the MySQL server. Password to login in is 'password123.'
+
+```
+mysql -u root -p
+```
+
+4. Run the following commands to create the database and seed with values.
+
+```
+source db/schema.sql
+source db/seeds.sql
 ```
 
 ## Usage:
@@ -51,7 +58,7 @@ npm i
 
 This code is a command-line interface (CLI) for managing employee information stored in a MySQL database. To use it, you need to have MySQL installed on your computer and have access to a MySQL server.<br>
 
-1. After the packages are installed, run the command node index.js to start the CLI.<br>
+1. After the packages are installed, run the command node index.js to start the app.<br>
 2. The CLI will prompt you with a list of options for viewing and adding employee information. Follow the prompts to select the desired option and enter the necessary information.<br>
 3. To exit the CLI, select the "Exit" option from the main menu or press Ctrl+C in the terminal/command prompt.<br>
 

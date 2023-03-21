@@ -1,5 +1,3 @@
-//START WITH 'mysql -u root -p'
-
 const inquirer = require("inquirer");
 const Employee = require("./lib/employee");
 const Role = require("./lib/role");
@@ -14,9 +12,6 @@ require("console.table");
 // // Express middleware
 // app.use(express.urlencoded({ extended: false }));
 // app.use(express.json());
-
-//https://www.npmjs.com/package/dotenv
-//https://www.youtube.com/watch?v=344Zv2m9TYI&ab_channel=TheFullStackJunkie
 
 const roleObj = new Role();
 const departmentObj = new Department();
@@ -198,8 +193,6 @@ const updateEmployeeRole = async function () {
 // app.listen(PORT, () => {
 //   console.log(`Server running on port ${PORT}`);
 // });
-
-// connection.end();
 
 console.log(`
 ███████ ███    ███ ██████  ██       ██████  ██    ██ ███████ ███████ 
